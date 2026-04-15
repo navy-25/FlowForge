@@ -14,7 +14,7 @@ class UsersController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::query();
+        $query = User::with('tenant');
 
         // FILTER: search by name/email
         if ($request->filled('search')) {
@@ -26,6 +26,11 @@ class UsersController extends Controller
             });
         }
 
+        // FILTER: tenant
+        if ($request->filled('tenant_id')) {
+            $query->where('tenant_id', $request->tenant_id);
+        }
+
         // FILTER: role
         if ($request->filled('role')) {
             $query->where('role', $request->role);
@@ -35,7 +40,7 @@ class UsersController extends Controller
         $perPage = $request->get('per_page', 10);
 
         $users = $query
-            ->select('id', 'name', 'email', 'role', 'created_at')
+            ->select('id', 'name', 'email', 'role', 'tenant_id', 'created_at')
             ->latest()
             ->paginate($perPage);
 

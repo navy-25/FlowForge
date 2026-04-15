@@ -11,13 +11,17 @@ bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-600
 <div class="grid grid-cols-[1fr_4fr] gap-4 items-start mb-4">
     <h1 class="text-start">Data Pengguna</h1>
     <div class="flex flex-wrap gap-3 ms-auto">
-        <input id="search" type="text" placeholder="Cari nama/email..." class="bg-white rounded-md py-2 px-3 outline-none w-50"
-        >
+        <input id="search" type="text" placeholder="Cari nama/email..." class="bg-white rounded-md py-2 px-3 outline-none w-50">
+
         <select id="role" class="bg-white rounded-md py-2 px-3 outline-none w-50">
             <option value="">Semua Peran</option>
             <option value="admin">Admin</option>
             <option value="editor">Editor</option>
             <option value="viewer">Viewer</option>
+        </select>
+
+        <select id="tenant_id" class="bg-white rounded-md py-2 px-3 outline-none w-50">
+            <option value="">Semua Tenant</option>
         </select>
 
         <button onclick="applyFilter()" class="bg-red-500 hover:bg-red-500 text-white px-6 py-2 rounded-md outline-none border-none cursor-pointer">
@@ -32,8 +36,8 @@ bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-600
                 <td class="py-2 px-3 font-[500] w-[50px]">#ID</td>
                 <td class="py-2 px-3 font-[500]">Nama Pengguna</td>
                 <td class="py-2 px-3 font-[500]">Email</td>
+                <td class="py-2 px-3 font-[500]">Penyewa</td>
                 <td class="py-2 px-3 font-[500]">Peran</td>
-                <td class="py-2 px-3 font-[500]">Status</td>
             </tr>
         </thead>
         <tbody id="userTable">
@@ -63,23 +67,44 @@ bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-600
 
 @section('page-scripts')
 <script>
-    // Dummy Data
-    const api_url   = '{{ route('api.users.index') }}'
-    let page        = 1;
+    const users_url     = '{{ route('api.users.index') }}'
+    const tenants_url   = '{{ route('api.tenants.index') }}'
+    let page            = 1;
 
+    loadTenants();
     loadUsers();
-    async function loadUsers() {
-        const search = document.getElementById('search')?.value || '';
-        const role = document.getElementById('role')?.value || '';
 
-        const url = `${api_url}?page=${page}&search=${search}&role=${role}`;
+    async function loadTenants() {
+        try {
+            const res   = await fetch(tenants_url);
+            const json  = await res.json();
+
+            const tenants   = json.data || [];
+            const select    = document.getElementById('tenant_id');
+
+            select.innerHTML = `<option value="">Semua Tenant</option>` +
+                tenants.map(t => `
+                    <option value="${t.id}">${t.name}</option>
+                `).join('');
+
+        } catch (err) {
+            console.error('Load tenants error:', err);
+        }
+    }
+
+    async function loadUsers() {
+        const search    = document.getElementById('search')?.value || '';
+        const role      = document.getElementById('role')?.value || '';
+        const tenant_id = document.getElementById('tenant_id')?.value || '';
+
+        const url = `${users_url}?page=${page}&search=${search}&role=${role}&tenant_id=${tenant_id}`;
 
         try {
-            const res = await fetch(url);
-            const json = await res.json();
+            const res   = await fetch(url);
+            const json  = await res.json();
 
-            const result = json.data;
-            const users = result.data || [];
+            const result    = json.data;
+            const users     = result.data || [];
 
             document.getElementById('userTable').innerHTML =
                 users.length
@@ -88,8 +113,8 @@ bg-red-50 text-red-600 hover:bg-red-50 hover:text-red-600
                             <td class="py-2 px-3">${user.id}</td>
                             <td class="py-2 px-3">${user.name}</td>
                             <td class="py-2 px-3 opacity-50">${user.email}</td>
+                            <td class="py-2 px-3 opacity-50 capitalize">${user.tenant.name ?? '-'}</td>
                             <td class="py-2 px-3 opacity-50 capitalize">${user.role ?? '-'}</td>
-                            <td class="py-2 px-3 opacity-50 capitalize">${user.status ?? '-'}</td>
                         </tr>
                     `).join('')
                     : `<tr><td colspan="5" class="p-3 text-center text-gray-500">No data</td></tr>`;

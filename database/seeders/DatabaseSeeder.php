@@ -3,36 +3,48 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $tenants = [
+            [
+                'name' => 'PT Nusantara Digital',
+                'users' => [
+                    ['name' => 'Budi Santoso', 'role' => 'admin'],
+                    ['name' => 'Siti Rahma', 'role' => 'editor'],
+                    ['name' => 'Andi Pratama', 'role' => 'viewer'],
+                ]
+            ],
+            [
+                'name' => 'CV Teknologi Maju',
+                'users' => [
+                    ['name' => 'Dewi Lestari', 'role' => 'admin'],
+                    ['name' => 'Rizky Saputra', 'role' => 'editor'],
+                    ['name' => 'Fajar Nugroho', 'role' => 'viewer'],
+                ]
+            ]
+        ];
 
-        User::create([
-            'name' => 'Sryiani',
-            'email' => 'admin@flowforge.com',
-            'role' => 'admin',
-            'password' => Hash::make('12345678'),
-        ]);
-        User::create([
-            'name' => 'Dendi Arman',
-            'email' => 'viewer@flowforge.com',
-            'role' => 'viewer',
-            'password' => Hash::make('12345678'),
-        ]);
-        User::create([
-            'name' => 'Naerika',
-            'email' => 'editor@flowforge.com',
-            'role' => 'editor',
-            'password' => Hash::make('12345678'),
-        ]);
+        foreach ($tenants as $tenantData) {
+            $tenant = Tenant::create([
+                'name' => $tenantData['name'],
+            ]);
+
+            foreach ($tenantData['users'] as $userData) {
+
+                User::create([
+                    'name'      => $userData['name'],
+                    'email'     => strtolower(str_replace(' ', '', $userData['name'])) . '@flowforge.com',
+                    'role'      => $userData['role'],
+                    'tenant_id' => $tenant->id,
+                    'password'  => Hash::make('12345678'),
+                ]);
+            }
+        }
     }
 }
