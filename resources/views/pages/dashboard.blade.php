@@ -11,10 +11,10 @@
         <div class="page-sub">Status sistem &amp; aktivitas real-time</div>
     </div>
     <div class="page-actions">
-        <button class="btn-ghost">
-            <i class="bi bi-arrow-clockwise"></i> Refresh </button>
-        <button class="btn-accent">
-            <i class="bi bi-plus"></i> Workflow Baru </button>
+        <a class="btn-ghost text-decoration-none" target="_blank" href="/docs/api">
+            <i class="bi bi-plus"></i> Dokumentasi API</a>
+        <a class="btn-accent text-decoration-none" href="{{ route('admin.workflow.index') }}">
+            <i class="bi bi-plus"></i> Workflow Baru </a>
     </div>
 </div>
 <!-- Stat cards -->
@@ -24,9 +24,8 @@
             <div class="sc-icon">
                 <i class="bi bi-lightning-charge-fill"></i>
             </div>
-            <span class="sc-trend">↑ 12%</span>
+            <div class="sc-value">{{ $data['active_workflows'] }}</div>
         </div>
-        <div class="sc-value">{{ $data['active_workflows'] }}</div>
         <div class="sc-label">Workflow Aktif</div>
         <div class="sc-bar"></div>
     </div>
@@ -35,9 +34,8 @@
             <div class="sc-icon">
                 <i class="bi bi-check2-circle"></i>
             </div>
-            <span class="sc-trend">↑ ---</span>
+            <div class="sc-value">{{ $data['completed_workflows'] }}</div>
         </div>
-        <div class="sc-value">---</div>
         <div class="sc-label">Tugas Selesai</div>
         <div class="sc-bar"></div>
     </div>
@@ -46,10 +44,9 @@
             <div class="sc-icon">
                 <i class="bi bi-hourglass-split"></i>
             </div>
-            <span class="sc-trend">→ ---</span>
+            <div class="sc-value">{{ $data['running_workflows'] }}</div>
         </div>
-        <div class="sc-value">---</div>
-        <div class="sc-label">Menunggu Review</div>
+        <div class="sc-label">Berjalan</div>
         <div class="sc-bar"></div>
     </div>
     <div class="stat-card card-red fade-in">
@@ -57,9 +54,8 @@
             <div class="sc-icon">
                 <i class="bi bi-x-circle"></i>
             </div>
-            <span class="sc-trend">↓ ---</span>
+            <div class="sc-value">{{ $data['failed_workflows'] }}</div>
         </div>
-        <div class="sc-value">---</div>
         <div class="sc-label">Gagal / Error</div>
         <div class="sc-bar"></div>
     </div>
@@ -98,97 +94,136 @@
             </tbody>
         </table>
     </div>
-    <!-- Side panels -->
-    <div class="side-panels">
-        <!-- Donut chart -->
-        <div class="panel">
-            <div class="panel-head">
-                <div class="panel-title">
-                    <i class="bi bi-pie-chart"></i> Distribusi Status
-                </div>
-            </div>
-            <div class="donut-wrap">
-                <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
-                    <!-- bg ring -->
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="#1e1e28" stroke-width="18" />
-                    <!-- segments (circumference = 2π×52 ≈ 326.7) -->
-                    <!-- green: 86% = 280.9 -->
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="#00d9c0" stroke-width="18" stroke-dasharray="281 326.7" stroke-dashoffset="81.7" stroke-linecap="butt" transform="rotate(-90 70 70)" />
-                    <!-- blue: 9% = 29.4 -->
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="#4d7cfe" stroke-width="18" stroke-dasharray="29.4 326.7" stroke-dashoffset="-199.3" stroke-linecap="butt" transform="rotate(-90 70 70)" />
-                    <!-- red: 5% = 16.3 -->
-                    <circle cx="70" cy="70" r="52" fill="none" stroke="#ff4d6a" stroke-width="18" stroke-dasharray="16.3 326.7" stroke-dashoffset="-228.7" stroke-linecap="butt" transform="rotate(-90 70 70)" />
-                    <!-- center text -->
-                    <text x="70" y="66" text-anchor="middle" class="donut-text-val">86%</text>
-                    <text x="70" y="82" text-anchor="middle" class="donut-text-lbl">Sukses</text>
-                </svg>
-                <div class="donut-legend">
-                    <div class="legend-row">
-                        <div class="legend-dot" style="background:var(--accent)"></div>
-                        <span class="legend-label">Selesai</span>
-                        <span class="legend-val">86%</span>
-                    </div>
-                    <div class="legend-row">
-                        <div class="legend-dot" style="background:var(--accent-2)"></div>
-                        <span class="legend-label">Berjalan</span>
-                        <span class="legend-val">9%</span>
-                    </div>
-                    <div class="legend-row">
-                        <div class="legend-dot" style="background:var(--accent-4)"></div>
-                        <span class="legend-label">Gagal</span>
-                        <span class="legend-val">5%</span>
-                    </div>
-                </div>
+    <div class="panel">
+        <div class="panel-head">
+            <div class="panel-title">
+                <i class="bi bi-rss"></i> Log Sistem
             </div>
         </div>
-        <!-- Quick feed -->
-        <div class="panel">
-            <div class="panel-head">
-                <div class="panel-title">
-                    <i class="bi bi-rss"></i> Log Sistem
+        <div class="activity-list">
+            @foreach ($log_workflow as $key => $value)
+                <div class="activity-item">
+                    @if ($value->status == 'success')
+                        <div class="act-icon" style="background:rgba(0,217,192,.08);color:var(--accent)">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                    @elseif ($value->status == 'failed')
+                        <div class="act-icon" style="background:rgba(255,77,106,.08);color:var(--accent-4)">
+                            <i class="bi bi-exclamation-lg"></i>
+                        </div>
+                    @elseif ($value->status == 'running')
+                        <div class="act-icon" style="background:rgba(245,166,35,.08);color:var(--accent-3)">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                    @endif
+                    <div class="act-body">
+                        @php
+                            $messages = $value->output ? json_decode($value->output) : $value->error;
+                            $type = gettype($messages);
+                        @endphp
+                        <div class="act-title text-capitalize">{{str_replace('_', ' ', $value->node_id) }} -
+                            @if ($type == 'object')
+                                @foreach ($messages as $item => $message)
+                                    @if ($item != 'message')
+                                        {{ $item }}
+                                    @endif
+                                    {{ $message == null ? 'Sedang diproses' : $message }}
+                                @endforeach
+                            @else
+                                {{ $messages }}
+                            @endif
+                        </div>
+                        <div class="act-meta text-capitalize">{{ $value->status }} #{{ $value->id }} · {{ diffForHuman($value->created_at) }}</div>
+                    </div>
                 </div>
-                <span class="panel-meta" style="display:flex;align-items:center;gap:5px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 2s infinite;box-shadow:0 0 5px var(--accent-glow)"></span> Live </span>
+            @endforeach
+        </div>
+    </div>
+    <!-- Donut chart -->
+    <div class="panel">
+        <div class="panel-head">
+            <div class="panel-title">
+                <i class="bi bi-pie-chart"></i> Distribusi Status
             </div>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <div class="act-icon" style="background:rgba(0,217,192,.08);color:var(--accent)">
-                        <i class="bi bi-check-lg"></i>
-                    </div>
-                    <div class="act-body">
-                        <div class="act-title">Workflow berhasil dijalankan</div>
-                        <div class="act-meta">Approval #128 · 2 mnt lalu</div>
-                    </div>
+        </div>
+        <div class="donut-wrap">
+            <div style="height: 260px;">
+                <canvas id="workflowDoughnutChart"></canvas>
+            </div>
+            <div class="donut-legend">
+                <div class="legend-row">
+                    <div class="legend-dot" style="background:var(--accent)"></div>
+                    <span class="legend-label">Selesai</span>
+                    <span class="legend-val">{{ $data['completed_percentage'] }}%</span>
                 </div>
-                <div class="activity-item">
-                    <div class="act-icon" style="background:rgba(255,77,106,.08);color:var(--accent-4)">
-                        <i class="bi bi-exclamation-lg"></i>
-                    </div>
-                    <div class="act-body">
-                        <div class="act-title">Koneksi database timeout</div>
-                        <div class="act-meta">Sistem · 18 mnt lalu</div>
-                    </div>
+                <div class="legend-row">
+                    <div class="legend-dot" style="background:var(--accent-2)"></div>
+                    <span class="legend-label">Berjalan</span>
+                    <span class="legend-val">{{ $data['running_percentage'] }}%</span>
                 </div>
-                <div class="activity-item">
-                    <div class="act-icon" style="background:rgba(77,124,254,.08);color:var(--accent-2)">
-                        <i class="bi bi-person-check"></i>
-                    </div>
-                    <div class="act-body">
-                        <div class="act-title">Pengguna baru ditambahkan</div>
-                        <div class="act-meta">Admin · 1 jam lalu</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="act-icon" style="background:rgba(245,166,35,.08);color:var(--accent-3)">
-                        <i class="bi bi-clock"></i>
-                    </div>
-                    <div class="act-body">
-                        <div class="act-title">Jadwal backup diperbarui</div>
-                        <div class="act-meta">Cron · 2 jam lalu</div>
-                    </div>
+                <div class="legend-row">
+                    <div class="legend-dot" style="background:var(--accent-4)"></div>
+                    <span class="legend-label">Gagal</span>
+                    <span class="legend-val">{{ $data['failed_percentage'] }}%</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('workflowDoughnutChart');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'Failed', 'Running'],
+            datasets: [{
+                data: [
+                    {{ $data['completed_workflows'] ?? 0 }},
+                    {{ $data['failed_workflows'] ?? 0 }},
+                    {{ $data['running_workflows'] ?? 0 }}
+                ],
+                backgroundColor: [
+                    '#00d9c0',
+                    '#ff4d6a',
+                    '#f5a623'
+                ],
+                borderColor: '#111114',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '72%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#ededf5',
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        padding: 18
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.raw;
+                            const percentage = total > 0
+                                ? ((value / total) * 100).toFixed(1)
+                                : 0;
+
+                            return `${context.label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
 @endsection

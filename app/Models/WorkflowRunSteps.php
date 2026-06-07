@@ -20,6 +20,6 @@ class WorkflowRunSteps extends Model
      */
     public function node_step()
     {
-        return $this->belongsTo(WorkflowRun::class);
+        return $this->belongsTo(WorkflowRun::class, 'workflow_run_id');
     }
 }

@@ -23,4 +23,9 @@ class Workflow extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function workflow_run()
+    {
+        return $this->hasOne(WorkflowRun::class, 'workflow_id')->latestOfMany();
+    }
 }

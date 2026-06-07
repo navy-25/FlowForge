@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWorkFlowRequest;
 use App\Models\Workflow;
+use App\Services\WorkflowEngineServices;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class WorkflowController extends Controller
 {
@@ -12,10 +15,9 @@ class WorkflowController extends Controller
      */
     public function index()
     {
-        $data = Workflow::with('user','user.tenant')
+        $data = Workflow::with(['user.tenant','workflow_run'])
             ->orderBy('created_at', 'DESC')
             ->get();
-        // dd($data);
         return view('pages.workflow', compact('data'));
     }
 
@@ -32,9 +34,48 @@ class WorkflowController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $flows  = config('flow');
+        $nodes = collect($flows[$request->definition]['definition']['nodes'])->map(function ($node) {
+            return [
+                'id'        => $node['id'],
+                'type'      => $node['type'],
+                'label'     => $node['label'],
+                'config'    => $node['config'],
+            ];
+        })->toArray();
+        $edges = $flows[$request->definition]['definition']['edges'] ?? [];
 
+        $trigger_type = $flows[$request->definition]['label'] == 'Kirim Email Otomatis' ? 'manual' : 'cron';
+        $cron_expression = null;
+        if ($trigger_type === 'cron') {
+            $cron_expression = "*/10 * * * *"; # setiap 10 menit
+        }
+        Workflow::create([
+            'user_id'           => 1,
+            // 'user_id'           => Auth::user()->id,
+            'name'              =>  $flows[$request->definition]['label'],
+            'version'           => 'v1',
+            'trigger_type'      => $trigger_type,
+            'cron_expression'   => $cron_expression,
+            'definition'    => [
+                'nodes'     => $nodes,
+                'edges'     => $edges,
+            ],
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Workflow berhasil dibuat.');
+    }
+    public function run($id, WorkflowEngineServices $engine)
+    {
+        $workflow = Workflow::findOrFail($id);
+        $engine->run($workflow);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Workflow berhasil dijalankan.');
+    }
     /**
      * Display the specified resource.
      */

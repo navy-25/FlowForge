@@ -29,11 +29,14 @@ class WorkflowSeeder extends Seeder
 
             $edges = $flow['definition']['edges'] ?? [];
 
-            $trigger_type = $flow['label'] == 'Kirim Email Otomatis' ? 'manual' : 'cron';
+            // $trigger_type = $flow['label'] == 'Kirim Email Otomatis' ? 'manual' : 'cron';
+            // $cron_expression = null;
+            // if ($trigger_type === 'cron') {
+            //     $cron_expression = "*/10 * * * *"; # setiap 10 menit
+            // }
+
+            $trigger_type = "manual";
             $cron_expression = null;
-            if ($trigger_type === 'cron') {
-                $cron_expression = "*/10 * * * *"; # setiap 10 menit
-            }
             Workflow::create([
                 'user_id'           => $user?->id,
                 'name'              => $flow['label'],

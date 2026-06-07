@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Workflow;
+use App\Models\WorkflowRun;
+use App\Models\WorkflowRunSteps;
 use Illuminate\Http\Request;
 
 class MonitorController extends Controller
@@ -13,11 +15,36 @@ class MonitorController extends Controller
     public function index()
     {
         $data['active_workflows'] = Workflow::count();
+        $data['completed_workflows'] = WorkflowRun::where('status', 'completed')->count();
+        $data['failed_workflows'] = WorkflowRun::where('status', 'failed')->count();
+        $data['running_workflows'] = WorkflowRun::where('status', 'running')->count();
+
+        $total = $data['completed_workflows'] + $data['failed_workflows'] + $data['running_workflows'];
+        $data['completed_percentage'] = $total > 0
+            ? round(($data['completed_workflows'] / $total) * 100, 2)
+            : 0;
+
+        $data['failed_percentage'] = $total > 0
+            ? round(($data['failed_workflows'] / $total) * 100, 2)
+            : 0;
+
+        $data['running_percentage'] = $total > 0
+            ? round(($data['running_workflows'] / $total) * 100, 2)
+            : 0;
+
+        $log_workflow = WorkflowRunSteps::orderBy('created_at', 'DESC')
+            ->take(5)
+            ->get();
         $last_activity = Workflow::with('user','user.tenant')
             ->orderBy('created_at', 'DESC')
             ->take(5)
             ->get();
-        return view('pages.dashboard', compact('data','last_activity'));
+        return view('pages.dashboard', compact(
+            'data',
+            'log_workflow',
+            'last_activity',
+            'total'
+        ));
     }
 
     /**

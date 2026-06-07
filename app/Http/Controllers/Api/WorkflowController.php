@@ -16,7 +16,21 @@ class WorkflowController extends Controller
      */
     public function index()
     {
-        return Workflow::all();
+        $workflows = Workflow::with([
+            'user.tenant',
+            'workflow_run',
+        ])
+        ->latest()
+        ->get()
+        ->map(function ($workflow) {
+            $workflow->created_at_human = diffForHuman($workflow->created_at);
+            return $workflow;
+        });
+
+        return response()->json([
+            'message' => 'Data workflow berhasil diambil',
+            'data' => $workflows,
+        ]);
     }
 
     /**
@@ -60,7 +74,12 @@ class WorkflowController extends Controller
      */
     public function run($id, WorkflowEngineServices $engine)
     {
-        $workflow = Workflow::findOrFail($id);
+        $workflow = Workflow::with('workflow_run')->findOrFail($id);
+        if ($workflow->workflow_run) {
+            $workflow->workflow_run->update([
+                'status' => 'running'
+            ]);
+        }
         return $engine->run($workflow);
     }
 

@@ -34,7 +34,7 @@ class NodeExecutorServices
 
                 $seconds = (int) ($config['seconds'] ?? 1);
                 sleep($seconds);
-                return ['delayed' => $seconds];
+                return ['delayed' => $seconds,'s'];
 
             default:
                 throw new \Exception("Unknown node type: {$type}");

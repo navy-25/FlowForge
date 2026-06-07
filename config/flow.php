@@ -47,45 +47,45 @@ return [
         ],
     ],
 
-    // 'crawling' => [
-    //     'label' => 'Crawling Data',
-    //     'description' => 'Workflow mengambil data dari API, mapping data, lalu mencatat hasilnya.',
-    //     'definition' => [
-    //         'nodes' => [
-    //             [
-    //                 'id' => 'fetch_data',
-    //                 'type' => 'http',
-    //                 'label' => 'Fetch Data',
-    //                 'config' => [
-    //                     'url' => 'https://api.viproject.net/api/portfolio/all/',
-    //                 ],
-    //                 'fields' => [
-    //                     ['name' => 'url', 'label' => 'URL', 'type' => 'text'],
-    //                 ],
-    //             ],
-    //             [
-    //                 'id' => 'save_data',
-    //                 'type' => 'delay',
-    //                 'label' => 'Save Data',
-    //                 'config' => [
-    //                     'seconds' => 1,
-    //                 ],
-    //                 'fields' => [],
-    //             ],
-    //             [
-    //                 'id' => 'log_crawling',
-    //                 'type' => 'log',
-    //                 'label' => 'Log Crawling Result',
-    //                 'config' => [
-    //                     'message' => 'Data crawling berhasil diproses',
-    //                 ],
-    //                 'fields' => [],
-    //             ],
-    //         ],
-    //         'edges' => [
-    //             ['from' => 'fetch_data', 'to' => 'delay_node'],
-    //             ['from' => 'delay_node', 'to' => 'log_crawling'],
-    //         ],
-    //     ],
-    // ],
+    'crawling' => [
+        'label' => 'Crawling Data',
+        'description' => 'Workflow mengambil data dari API, mapping data, lalu mencatat hasilnya.',
+        'definition' => [
+            'nodes' => [
+                [
+                    'id' => 'fetch_data',
+                    'type' => 'http',
+                    'label' => 'Fetch Data',
+                    'config' => [
+                        'url' => 'https://api.viproject.net/api/portfolio/all/',
+                    ],
+                    'fields' => [
+                        ['name' => 'url', 'label' => 'URL', 'type' => 'text'],
+                    ],
+                ],
+                [
+                    'id' => 'save_data',
+                    'type' => 'delay',
+                    'label' => 'Save Data',
+                    'config' => [
+                        'seconds' => 1,
+                    ],
+                    'fields' => [],
+                ],
+                [
+                    'id' => 'log_crawling',
+                    'type' => 'log',
+                    'label' => 'Log Crawling Result',
+                    'config' => [
+                        'message' => 'Data crawling berhasil diproses',
+                    ],
+                    'fields' => [],
+                ],
+            ],
+            'edges' => [
+                ['from' => 'fetch_data', 'to' => 'delay_node'],
+                ['from' => 'delay_node', 'to' => 'log_crawling'],
+            ],
+        ],
+    ],
 ];

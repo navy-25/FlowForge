@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\WorkflowController;
 use Illuminate\Support\Facades\Route;
@@ -18,9 +19,10 @@ Route::name('admin.')->group(function () {
     });
     Route::prefix('/workflow')->name('workflow.')->controller(WorkflowController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::post('/store', 'store')->name('store');
+        Route::post('{id}/run', 'run')->name('run');
+    });
+    Route::prefix('/history')->name('history.')->controller(HistoryController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
     });
 });
-
-Route::get('/history', function () {
-    return view('pages.history');
-})->name('admin.history');

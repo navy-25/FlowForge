@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>FlowForge — Monitoring</title>
+        <title>FlowForge</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -46,7 +46,8 @@
             </div>
             <!-- /main -->
         </div>
-        <!-- /shell --><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script>
+        <!-- /shell -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script>
             // Clock
             (function tick() {
                 var el = document.getElementById('clock');
@@ -75,5 +76,7 @@
             style.textContent = '@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}';
             document.head.appendChild(style);
         </script>
+
+        @yield('scripts')
     </body>
 </html>

@@ -17,9 +17,8 @@
         <a href="{{ route('admin.workflow.index') }}" class="sb-link @yield('sidebar-workflow')">
             <i class="bi bi-diagram-3"></i>
             <span>Workflow</span>
-            <span class="sb-badge">12</span>
         </a>
-        <a href="{{ route('admin.history') }}" class="sb-link @yield('sidebar-history')">
+        <a href="{{ route('admin.history.index') }}" class="sb-link @yield('sidebar-history')">
             <i class="bi bi-clock-history"></i>
             <span>Riwayat</span>
         </a>

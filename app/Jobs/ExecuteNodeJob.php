@@ -106,11 +106,11 @@ class ExecuteNodeJob implements ShouldQueue
              */
             $currentContext = $this->context ?? [];
 
-            Log::info('[Workflow] CONTEXT BEFORE EXECUTE', [
-                'run_id'  => $this->run->id,
-                'node'    => $this->node['id'],
-                'context' => $currentContext
-            ]);
+            // Log::info('[Workflow] CONTEXT BEFORE EXECUTE', [
+            //     'run_id'  => $this->run->id,
+            //     'node'    => $this->node['id'],
+            //     'context' => $currentContext
+            // ]);
 
             /**
              * 3. EXECUTE NODE
@@ -119,7 +119,6 @@ class ExecuteNodeJob implements ShouldQueue
                 $this->node,
                 $currentContext
             );
-
             /**
              * 4. NORMALIZE OUTPUT (wajib array untuk JSON column)
              */
@@ -163,7 +162,6 @@ class ExecuteNodeJob implements ShouldQueue
              * 8. DISPATCH NEXT NODES (PARALLEL SAFE)
              */
             foreach ($nextNodes as $nextNode) {
-
                 // hanya jalan kalau dependency selesai
                 if (
                     DagHelper::isNodeReady(
@@ -183,7 +181,7 @@ class ExecuteNodeJob implements ShouldQueue
         } catch (\Throwable $e) {
 
             /**
-             * ❌ HANDLE ERROR
+             * HANDLE ERROR
              */
             $step->update([
                 'status' => 'failed',
@@ -196,14 +194,14 @@ class ExecuteNodeJob implements ShouldQueue
             ]);
 
             /**
-             * ❌ FAIL FAST (optional strategy)
+             * FAIL FAST (optional strategy)
              */
             $this->run->update([
                 'status'      => 'failed',
                 'finished_at' => now()
             ]);
 
-            throw $e; // biar retry jalan
+            throw $e;
         }
 
         /**
