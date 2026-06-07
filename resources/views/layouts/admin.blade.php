@@ -1,82 +1,79 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
     <head>
         <meta charset="UTF-8" />
-        <title>Dashboard</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <title>FlowForge — Monitoring</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        
-        @include('includes.style')
-
-        @yield('page-style')
+        @include('includes.style-dashboard')
     </head>
-    <body class="min-h-screen bg-gray-100">
-        <div class="flex h-screen">
-            {{-- Sidebar --}}
-            <aside id="sidebar" class="bg-white w-[200px] hidden shadow-sm md:block">
-                <div class="p-4 text-xl font-semibold">FlowForge</div>
-                <nav class="px-2 py-4 space-y-2 text-sm">
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center p-2 px-3 text-gray-700 rounded-md hover:bg-gray-50 @yield('sidebar-dashboard')">
-                        <span>Monitoring</span>
-                    </a>
-                    <a href="{{ route('admin.workflow') }}" class="flex items-center p-2 px-3 text-gray-700 rounded-md hover:bg-gray-50 @yield('sidebar-workflow')">
-                        <span>Workflow</span>
-                    </a>
-                    <a href="{{ route('admin.history') }}" class="flex items-center p-2 px-3 text-gray-700 rounded-md hover:bg-gray-50 @yield('sidebar-history')">
-                        <span>Riwayat</span>
-                    </a>
-                    <a href="{{ route('admin.users') }}" class="flex items-center p-2 px-3 text-gray-700 rounded-md hover:bg-gray-50 @yield('sidebar-users')">
-                        <span>Pengguna</span>
-                    </a>
-                </nav>
-            </aside>
-
-            {{-- Main --}}
-            <div class="flex-1 flex flex-col">
-                {{-- Navbar --}}
-                <div class="bg-white px-6 py-3">
-                    <center>
-                        <div class="max-w-6xl">
-                            <header class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <button id="sidebarToggle" class="md:hidden p-2 aspect-square rounded bg-gray-100 hover:bg-gray-200" aria-label="Toggle sidebar">☰</button>
-                                </div>
-                                <div class="flex items-center space-x-4">
-                                    <div class="hidden sm:block text-sm text-gray-600">Admin</div>
-                                    <a href="/" class="px-3 py-1 bg-red-50 text-red-600 rounded-md hover:bg-red-100">Keluar</a>
-                                </div>
-                            </header>
+    <body>
+        <div class="shell">
+            @include('includes.sidebar')
+            <!-- overlay -->
+            <div class="overlay" id="overlay"></div>
+            <!-- ═══════════ MAIN ═══════════ -->
+            <div class="main">
+                <!-- Topbar -->
+                <header class="topbar">
+                    <button class="topbar-toggle" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="topbar-path">
+                        <span>FlowForge</span>
+                        <i class="bi bi-chevron-right"></i>
+                        <span class="active">@yield('page-title')</span>
+                    </div>
+                    <div class="topbar-right">
+                        <span class="tb-time" id="clock">—</span>
+                        {{-- <div class="tb-divider"></div>
+                        <div class="tb-btn">
+                            <i class="bi bi-bell"></i>
+                            <span class="dot"></span>
                         </div>
-                    </center>
-                </div>
-
-                {{-- Content --}}
-                <main class="p-6 overflow-auto">
-                    <center>
-                        <div class="max-w-6xl text-start">
-                            @yield('content')
-                        </div>
-                    </center>
+                        <div class="tb-btn">
+                            <i class="bi bi-terminal"></i>
+                        </div> --}}
+                    </div>
+                </header>
+                <!-- Content -->
+                <main class="content">
+                    @yield('content')
                 </main>
             </div>
+            <!-- /main -->
         </div>
-
-        @include('includes.scripts')
-        <script>
-            // Sidebar toogle
-            (function(){
-                var btn = document.getElementById('sidebarToggle');
-                var sidebar = document.getElementById('sidebar');
-                if (!btn || !sidebar) return;
-                btn.addEventListener('click', function(){
-                    sidebar.classList.toggle('hidden');
+        <!-- /shell --><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script>
+            // Clock
+            (function tick() {
+                var el = document.getElementById('clock');
+                var now = new Date();
+                el.textContent = now.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
                 });
+                setTimeout(tick, 1000);
             })();
+            // Sidebar toggle
+            var toggle = document.getElementById('sidebarToggle');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('overlay');
+            toggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+            // pulse keyframe for live dot
+            var style = document.createElement('style');
+            style.textContent = '@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}';
+            document.head.appendChild(style);
         </script>
-        @yield('page-scripts')
     </body>
 </html>
